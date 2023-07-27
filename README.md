@@ -10,27 +10,27 @@ Copyright (C) 2023 Takym.
 ### ビルド方法
 0. [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0)をインストールしてください。
 1. このリポジトリをクローンしてください。
-	* > `git clone https://github.com/Takym/FastChatProtocolInterface.git`
+	* `git clone https://github.com/Takym/FastChatProtocolInterface.git`
 2. 作業ディレクトリを `FastChatProtocolInterface` へ移動してください。
-	* > `cd FastChatProtocolInterface`
+	* `cd FastChatProtocolInterface`
 3. ビルドしてください。
-	* > `dotnet build`
+	* `dotnet build`
 
 ### 実行方法
 1. 「ビルド方法」と同等の方法でクローンされているものとします。
 2. 作業ディレクトリを `FastChatProtocolInterface\bin\Debug\net7.0` へ移動してください。
-	* > `cd FastChatProtocolInterface\bin\Debug\net7.0`
+	* `cd FastChatProtocolInterface\bin\Debug\net7.0`
 	* ビルド設定を変更した場合、別のディレクトリに出力されている可能性があります。
 3. 実行してください。
-	* > `fachpi -v -h`
-	* > `fachpi -m server [オプション...]`
-	* > `fachpi -m client -n <ホスト名> -p <ポート番号> [オプション...]`
+	* `fachpi -v -h`
+	* `fachpi -m server [オプション...]`
+	* `fachpi -m client -n <ホスト名> -p <ポート番号> [オプション...]`
 
 ### コマンド行引数
 0. 最新の説明書を表示するにはこの方法を試してください。
 1. 「ビルド方法」と同等の方法でクローンされているものとします。
 2. 下記のコマンドを実行してください。
-	* > `dotnet run --project FastChatProtocolInterface -- -v -h`
+	* `dotnet run --project FastChatProtocolInterface -- -v -h`
 3. 下記の様な説明書が表示される筈です。
 	```
 	FACHPI: Fast Chat Protocol/Interface
