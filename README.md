@@ -8,7 +8,7 @@ Copyright (C) 2023 Takym.
 ## 使用方法
 
 ### ビルド方法
-0. [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0)をインストールしてください。
+0. [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0) をインストールしてください。
 1. このリポジトリをクローンしてください。
 	* `git clone https://github.com/Takym/FastChatProtocolInterface.git`
 2. 作業ディレクトリを `FastChatProtocolInterface` へ移動してください。
