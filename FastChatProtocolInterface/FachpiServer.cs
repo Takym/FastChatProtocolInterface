@@ -11,14 +11,9 @@ using System.Net.Sockets;
 
 namespace FastChatProtocolInterface
 {
-	public class FachpiServer : FachpiNode
+	public class FachpiServer(IPAddress ipAddr, int port) : FachpiNode
 	{
-		private readonly TcpListener _listener;
-
-		public FachpiServer(IPAddress ipAddr, int port)
-		{
-			_listener = new(ipAddr, port);
-		}
+		private readonly TcpListener _listener = new(ipAddr, port);
 
 		public void Start()
 		{
@@ -40,9 +35,6 @@ namespace FastChatProtocolInterface
 			task.GetAwaiter().OnCompleted(conn.OnConnected);
 		}
 
-		public void Stop()
-		{
-			_listener.Stop();
-		}
+		public void Stop() => _listener.Stop();
 	}
 }

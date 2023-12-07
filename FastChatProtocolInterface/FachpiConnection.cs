@@ -26,12 +26,12 @@ namespace FastChatProtocolInterface
 
 		static FachpiConnection()
 		{
-			_sig = new byte[] {
+			_sig = [
 				0x46, 0x41, 0x43, 0x48, 0x50, 0x49, 0x00, 0xFF,
 				0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF
-			};
+			];
 			_enc   = new UTF8Encoding(false, false);
-			_conns = new();
+			_conns = [];
 		}
 
 		public FachpiConnection(FachpiNode owner, Task<TcpClient> task)
@@ -137,14 +137,10 @@ namespace FastChatProtocolInterface
 		}
 
 		protected static void SendText(NetworkStream ns, string text)
-		{
-			SendData(ns, _enc.GetBytes(text));
-		}
+			=> SendData(ns, _enc.GetBytes(text));
 
 		protected static string ReceiveText(NetworkStream ns)
-		{
-			return _enc.GetString(ReceiveData(ns));
-		}
+			=> _enc.GetString(ReceiveData(ns));
 
 		protected static void SendData(NetworkStream ns, ReadOnlySpan<byte> data)
 		{

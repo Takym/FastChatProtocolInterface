@@ -12,8 +12,6 @@ namespace FastChatProtocolInterface
 {
 	public class FachpiClient : FachpiNode
 	{
-		public FachpiClient() { }
-
 		public void Connect(string hostName, int port)
 		{
 			var conn = new FachpiConnection(
