@@ -5,11 +5,12 @@ Copyright (C) 2023 Takym.
 ## 概要
 このツールは、単純な文字列のみの通信を行います。
 「FACHPI」は「ファクパイ」と読みます。
+「SIFOSC」は「シフォスク」と読みます。
 
 ## 使用方法
 
 ### ビルド方法
-0. [.NET 7](https://dotnet.microsoft.com/download/dotnet/7.0) をインストールしてください。
+0. [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0) をインストールしてください。
 1. このリポジトリをクローンしてください。
 	* `git clone https://github.com/Takym/FastChatProtocolInterface.git`
 2. 作業ディレクトリを `FastChatProtocolInterface` へ移動してください。
@@ -19,8 +20,8 @@ Copyright (C) 2023 Takym.
 
 ### 実行方法
 1. 「ビルド方法」と同等の方法でクローンされているものとします。
-2. 作業ディレクトリを `FastChatProtocolInterface\bin\Debug\net7.0` へ移動してください。
-	* `cd FastChatProtocolInterface\bin\Debug\net7.0`
+2. 作業ディレクトリを `FastChatProtocolInterface\bin\Debug\net8.0` へ移動してください。
+	* `cd FastChatProtocolInterface\bin\Debug\net8.0`
 	* ビルド設定を変更した場合、別のディレクトリに出力されている可能性があります。
 3. 実行してください。
 	* `fachpi -v -h`
@@ -37,7 +38,7 @@ Copyright (C) 2023 Takym.
 	FACHPI: Fast Chat Protocol/Interface
 	Copyright (C) 2023 Takym.
 
-	バージョン：0.0.0.0
+	バージョン：0.1.0.0
 
 	FACHPI コマンド行引数説明書
 	===========================
@@ -58,11 +59,20 @@ Copyright (C) 2023 Takym.
 	/ExecutionMode  -m        実行モードを指定する。
 	                          サーバーの場合は、server を指定する。
 	                          クライアントの場合は、client を指定する。
+	                          下記に完全な実行モードの一覧を示す。
 	/HostName       -n        ホスト名を指定する。
 	                          この値はクライアントの場合のみ使用される。
 	/Port           -p        ポート番号を指定する。
 	                          クライアントの場合は必ず指定しなければならない。
 	/UserName       -u        利用者の表示名を指定する。
+
+	実行モード一覧
+	モード名 説明
+	server   最適なサーバーを起動する。
+	fachpi   通常のサーバーを起動する。如何なる拡張機能も使用しない事を強制する。
+	sifosc   SIFOSC 機能を有効にしてサーバーを起動する。
+	client   クライアントを起動する。
+	repl     サーバーを起動せずに SIFOSC を実行する。
 
 	注意：幾つかのオプションにはこの説明書に記載されていない別表記があります。
 	```
