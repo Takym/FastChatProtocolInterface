@@ -11,17 +11,13 @@ namespace FastChatProtocolInterface
 {
 	internal static class Program
 	{
-		private static void Run(in CommandLineArgument args)
-		{
-			args.PrintHeader();
-			args.ExecutionMode?.Run(args);
-		}
-
 		[STAThread()]
 		private static int Main(string[] args)
 		{
 			try {
-				Run(CommandLineArgument.ParseArgs(args));
+				var parsedArgs = CommandLineArguments.ParseArgs(args);
+				parsedArgs.PrintHeader();
+				parsedArgs.ExecutionMode?.Run(parsedArgs);
 				return 0;
 			} catch (Exception e) {
 				Console.ForegroundColor = ConsoleColor.Red;

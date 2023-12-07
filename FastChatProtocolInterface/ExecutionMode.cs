@@ -34,7 +34,7 @@ namespace FastChatProtocolInterface
 			}
 		}
 
-		public abstract void Run(in CommandLineArgument args);
+		public abstract void Run(in CommandLineArguments args);
 
 		private sealed class ServerImpl : ExecutionMode
 		{
@@ -42,7 +42,7 @@ namespace FastChatProtocolInterface
 
 			private ServerImpl() { }
 
-			public override void Run(in CommandLineArgument args)
+			public override void Run(in CommandLineArguments args)
 			{
 				var server = new FachpiServer(IPAddress.Any, args.Port) {
 					Name = args.UserName
@@ -61,7 +61,7 @@ namespace FastChatProtocolInterface
 
 			private ClientImpl() { }
 
-			public override void Run(in CommandLineArgument args)
+			public override void Run(in CommandLineArguments args)
 			{
 				var client = new FachpiClient() {
 					Name = args.UserName

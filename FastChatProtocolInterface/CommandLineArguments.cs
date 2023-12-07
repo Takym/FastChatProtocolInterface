@@ -11,7 +11,7 @@ using System.Text;
 
 namespace FastChatProtocolInterface
 {
-	public readonly record struct CommandLineArgument(
+	public readonly record struct CommandLineArguments(
 		Assembly       Assembly,
 		bool           ShowVersion,
 		bool           ShowHelp,
@@ -52,10 +52,10 @@ namespace FastChatProtocolInterface
 			}
 		}
 
-		public static CommandLineArgument ParseArgs(string[] args)
+		public static CommandLineArguments ParseArgs(string[] args)
 		{
-			var result = new CommandLineArgument(
-				Assembly:      typeof(CommandLineArgument).Assembly,
+			var result = new CommandLineArguments(
+				Assembly:      typeof(CommandLineArguments).Assembly,
 				ShowVersion:   false,
 				ShowHelp:      false,
 				ShowLogo:      true,
