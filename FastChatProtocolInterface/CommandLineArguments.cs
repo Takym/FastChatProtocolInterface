@@ -164,7 +164,7 @@ namespace FastChatProtocolInterface
 			Console.WriteLine("/ExecutionMode  -m        実行モードを指定する。");
 			Console.WriteLine("                          サーバーの場合は、server を指定する。");
 			Console.WriteLine("                          クライアントの場合は、client を指定する。");
-			Console.WriteLine("                          下記に完全な実行モードの一覧を示す。");
+			Console.WriteLine("                          下記に完全な実行モードの一覧を記す。");
 			Console.WriteLine("/HostName       -n        ホスト名を指定する。");
 			Console.WriteLine("                          この値はクライアントの場合のみ使用される。");
 			Console.WriteLine("/Port           -p        ポート番号を指定する。");
