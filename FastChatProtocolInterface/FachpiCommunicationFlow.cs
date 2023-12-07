@@ -18,7 +18,37 @@ namespace FastChatProtocolInterface
 		private          string?              _local_name;
 		private          string?              _remote_name;
 
-		public bool IsDisposed => _disposed;
+		public bool    IsDisposed  => _disposed;
+		public bool    IsValidated => _validated;
+		public string? LocalName   => _local_name;
+		public string? RemoteName  => _remote_name;
+
+		public NetworkStream Stream
+		{
+			get
+			{
+				ObjectDisposedException.ThrowIf(_disposed, this);
+				return _ns;
+			}
+		}
+
+		public BinaryReader Reader
+		{
+			get
+			{
+				ObjectDisposedException.ThrowIf(_disposed, this);
+				return _br;
+			}
+		}
+
+		public BinaryWriter Writer
+		{
+			get
+			{
+				ObjectDisposedException.ThrowIf(_disposed, this);
+				return _bw;
+			}
+		}
 
 		public FachpiCommunicationFlow(FachpiNode node, TcpClient tc, ReadOnlyMemory<byte> sig)
 		{
@@ -94,10 +124,10 @@ namespace FastChatProtocolInterface
 		}
 
 		private void RunSender()
-			=> _node.RunSenderProcess(_bw, _msgs);
+			=> _node.RunSenderProcess(this);
 
 		private void RunReceiver()
-			=> _node.RunReceiverProcess(_br, _ns, _remote_name);
+			=> _node.RunReceiverProcess(this);
 
 		public void Dispose()
 		{

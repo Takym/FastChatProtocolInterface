@@ -29,20 +29,20 @@ namespace FastChatProtocolInterface
 		public override void OnConnected()
 			=> Console.WriteLine("クライアントとして動作しています。");
 
-		protected override void RunSenderProcessCore(BinaryWriter writer, ConcurrentQueue<string> messages, CancellationToken cancellationToken)
+		protected override void RunSenderProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken)
 		{
 			while (!cancellationToken.IsCancellationRequested) {
 				if (Console.ReadLine() is not null and string msg) {
-					writer.Write(msg);
+					flow.Writer.Write(msg);
 				}
 			}
 		}
 
-		protected override void RunReceiverProcessCore(BinaryReader reader, NetworkStream ns, string remoteName, CancellationToken cancellationToken)
+		protected override void RunReceiverProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken)
 		{
 			while (!cancellationToken.IsCancellationRequested) {
-				ns.WaitForDataAvailable();
-				Console.WriteLine("{0}: {1}", remoteName, reader.ReadString());
+				flow.Stream.WaitForDataAvailable();
+				Console.WriteLine("{0}: {1}", flow.RemoteName, flow.Reader.ReadString());
 			}
 		}
 	}

@@ -25,30 +25,20 @@ namespace FastChatProtocolInterface
 
 		public abstract void OnConnected();
 
-		public void RunSenderProcess(BinaryWriter writer, ConcurrentQueue<string> messages, CancellationToken cancellationToken = default)
+		public void RunSenderProcess(FachpiCommunicationFlow flow, CancellationToken cancellationToken = default)
 		{
-			ArgumentNullException.ThrowIfNull(writer);
-			ArgumentNullException.ThrowIfNull(messages);
-
-			this.RunSenderProcessCore(writer, messages, cancellationToken);
+			ArgumentNullException.ThrowIfNull(flow);
+			this.RunSenderProcessCore(flow, cancellationToken);
 		}
 
-		public void RunReceiverProcess(BinaryReader reader, NetworkStream ns, string remoteName, CancellationToken cancellationToken = default)
+		public void RunReceiverProcess(FachpiCommunicationFlow flow, CancellationToken cancellationToken = default)
 		{
-			ArgumentNullException.ThrowIfNull(reader);
-			ArgumentNullException.ThrowIfNull(remoteName);
-
-			this.RunReceiverProcessCore(reader, ns, remoteName, cancellationToken);
-
-			/* if (reader.BaseStream is NetworkStream ns) {
-				this.RunReceiverProcessCore(reader, ns, messageQueues, remoteName, cancellationToken);
-			} else {
-				throw new ArgumentException("The underlying stream of the reader must be a network stream.", nameof(reader));
-			} //*/
+			ArgumentNullException.ThrowIfNull(flow);
+			this.RunReceiverProcessCore(flow, cancellationToken);
 		}
 
-		protected abstract void RunSenderProcessCore(BinaryWriter writer, ConcurrentQueue<string> messages, CancellationToken cancellationToken);
+		protected abstract void RunSenderProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken);
 
-		protected abstract void RunReceiverProcessCore(BinaryReader reader, NetworkStream ns, string remoteName, CancellationToken cancellationToken);
+		protected abstract void RunReceiverProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken);
 	}
 }
