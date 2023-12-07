@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+
 using MessageQueues = System.Collections.Concurrent.ConcurrentDictionary<
 	FastChatProtocolInterface.FachpiCommunicationFlow,
 	System.Collections.Concurrent.ConcurrentQueue<string>
@@ -71,7 +72,7 @@ namespace FastChatProtocolInterface
 			_mq.AddOrUpdate(flow, k => new(), (k, v) => v);
 		}
 
-		protected override void RunSenderProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken)
+		protected sealed override void RunSenderProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken)
 		{
 			while (!cancellationToken.IsCancellationRequested) {
 				ObjectDisposedException.ThrowIf(_disposed, this);
@@ -79,12 +80,15 @@ namespace FastChatProtocolInterface
 				if (_mq .TryGetValue(flow, out var     msgs) &&
 					msgs.TryDequeue (      out string? msg ) &&
 					msg is not null) {
-					flow.Writer.Write(msg);
+					this.SendMessageCore(flow, msg);
 				}
 			}
 		}
 
-		protected override void RunReceiverProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken)
+		protected virtual void SendMessageCore(FachpiCommunicationFlow flow, string message)
+			=> flow.Writer.Write(message);
+
+		protected sealed override void RunReceiverProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken)
 		{
 			while (!cancellationToken.IsCancellationRequested) {
 				ObjectDisposedException.ThrowIf(_disposed, this);
@@ -94,7 +98,7 @@ namespace FastChatProtocolInterface
 					"[{0:yyyy/MM/dd HH\\:mm\\:ss.fffffff}]<{1}>{2}",
 					DateTime.Now,
 					flow.RemoteName,
-					flow.Reader.ReadString()
+					this.ReceiveMessageCore(flow)
 				);
 				Console.WriteLine(msg);
 				foreach (var pair in _mq) {
@@ -102,6 +106,9 @@ namespace FastChatProtocolInterface
 				}
 			}
 		}
+
+		protected virtual string ReceiveMessageCore(FachpiCommunicationFlow flow)
+			=> flow.Reader.ReadString();
 
 		public void Dispose()
 		{
