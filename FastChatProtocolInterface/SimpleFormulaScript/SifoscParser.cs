@@ -52,7 +52,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 				sc.SkipSpaces();
 				if (sc.AdvanceIf(']')) {
-					result = new() { Values = [ ..list ] };
+					result = new() { Values = list.ToArray() };
 					return true;
 				}
 			}

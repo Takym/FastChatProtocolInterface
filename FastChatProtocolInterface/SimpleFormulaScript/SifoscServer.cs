@@ -25,12 +25,17 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 		public static string RunScriptLine(string s)
 		{
+			// SIFOSC の例：[ null, newobj, 123, +456, -789, [ ] ]
+
 			var sc = new SourceCode(s);
 			if (sc.TryParseValue(out var result)) {
-				return result.ToString();
-			} else {
-				return "（有効な SIFOSC ではありませんでした。）" + sc.Text;
+				sc.SkipSpaces();
+				if (sc.Index >= sc.Length) {
+					return result.ToString();
+				}
 			}
+
+			return "（有効な SIFOSC ではありませんでした。）" + sc.Text;
 		}
 	}
 }

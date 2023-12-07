@@ -73,7 +73,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		public bool TryPeekChar(out char result)
 		{
 			if (_idx < _src.Length) {
-				result = _src[_idx++];
+				result = _src[_idx];
 				return true;
 			} else {
 				result = '\0';
