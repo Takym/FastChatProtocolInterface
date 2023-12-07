@@ -64,6 +64,7 @@ namespace FastChatProtocolInterface
 
 			this.Run();
 			Console.WriteLine("サーバーとして動作しています。");
+			Console.WriteLine();
 		}
 
 		protected override void OnStartFlowCore(FachpiCommunicationFlow flow)

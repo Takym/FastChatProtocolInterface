@@ -18,6 +18,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 			Console.WriteLine("受信した文字列を SIFOSC として解析します。");
 			Console.WriteLine("この機能には未実装の部分が含まれています。");
+			Console.WriteLine();
 		}
 
 		protected override string ReceiveMessageCore(FachpiCommunicationFlow flow)

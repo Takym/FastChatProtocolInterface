@@ -25,7 +25,10 @@ namespace FastChatProtocolInterface
 		}
 
 		public override void OnConnected()
-			=> Console.WriteLine("クライアントとして動作しています。");
+		{
+			Console.WriteLine("クライアントとして動作しています。");
+			Console.WriteLine();
+		}
 
 		protected override void RunSenderProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken)
 		{
