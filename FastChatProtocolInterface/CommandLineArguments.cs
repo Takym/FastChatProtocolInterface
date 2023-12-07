@@ -177,6 +177,7 @@ namespace FastChatProtocolInterface
 			Console.WriteLine("fachpi   通常のサーバーを起動する。如何なる拡張機能も使用しない事を強制する。");
 			Console.WriteLine("sifosc   SIFOSC 機能を有効にしてサーバーを起動する。");
 			Console.WriteLine("client   クライアントを起動する。");
+			Console.WriteLine("repl     サーバーを起動せずに SIFOSC を実行する。");
 			Console.WriteLine();
 			Console.WriteLine("注意：幾つかのオプションにはこの説明書に記載されていない別表記があります。");
 			Console.WriteLine();

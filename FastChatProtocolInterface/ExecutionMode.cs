@@ -5,6 +5,7 @@
  * distributed under the MIT License.
 ****/
 
+using System;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Threading;
@@ -26,6 +27,7 @@ namespace FastChatProtocolInterface
 			_modes.TryAdd("fachpi", ServerImpl._inst_fachpi);
 			_modes.TryAdd("sifosc", ServerImpl._inst_sifosc);
 			_modes.TryAdd("client", ClientImpl._inst);
+			_modes.TryAdd("repl",   ReplImpl  ._inst);
 		}
 
 		public static ExecutionMode? GetMode(string name)
@@ -77,6 +79,30 @@ namespace FastChatProtocolInterface
 				};
 
 				client.Connect(args.HostName, args.Port);
+			}
+		}
+
+		private sealed class ReplImpl : ExecutionMode
+		{
+			internal static readonly ReplImpl _inst = new();
+
+			private ReplImpl() { }
+
+			public override void Run(in CommandLineArguments args)
+			{
+				Console.WriteLine("SIFOSC を実行できます。");
+
+				while (true) {
+					Console.Write("> ");
+
+					string? input = Console.ReadLine();
+					if (!string.IsNullOrEmpty(input)) {
+						string output = SifoscServer.RunScriptLine(input);
+
+						Console.WriteLine(output);
+						Console.WriteLine();
+					}
+				}
 			}
 		}
 	}

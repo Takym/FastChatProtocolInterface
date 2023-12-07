@@ -21,8 +21,11 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		}
 
 		protected override string ReceiveMessageCore(FachpiCommunicationFlow flow)
+			=> RunScriptLine(flow.Reader.ReadString());
+
+		public static string RunScriptLine(string s)
 		{
-			var sc = new SourceCode(flow.Reader.ReadString());
+			var sc = new SourceCode(s);
 			if (sc.TryParseValue(out var result)) {
 				return result.ToString();
 			} else {
