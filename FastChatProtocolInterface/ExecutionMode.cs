@@ -44,7 +44,7 @@ namespace FastChatProtocolInterface
 
 			public override void Run(in CommandLineArguments args)
 			{
-				var server = new FachpiServer(IPAddress.Any, args.Port) {
+				using var server = new FachpiServer(IPAddress.Any, args.Port) {
 					Name = args.UserName
 				};
 

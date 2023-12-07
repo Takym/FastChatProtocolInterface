@@ -7,21 +7,24 @@ namespace FastChatProtocolInterface
 {
 	public class FachpiCommunicationFlow : IDisposable
 	{
-		private          bool                 _disposed;
-		private readonly FachpiNode           _node;
-		private readonly TcpClient            _tc;
-		private readonly NetworkStream        _ns;
-		private readonly BinaryReader         _br;
-		private readonly BinaryWriter         _bw;
-		private readonly ReadOnlyMemory<byte> _sig;
-		private          bool                 _validated;
-		private          string?              _local_name;
-		private          string?              _remote_name;
+		private static readonly ReadOnlyMemory<byte> _sig;
+		private        readonly FachpiConnection     _conn;
+		private        readonly FachpiNode           _node;
+		private        readonly TcpClient            _tc;
+		private        readonly NetworkStream        _ns;
+		private        readonly BinaryReader         _br;
+		private        readonly BinaryWriter         _bw;
+		private                 bool                 _disposed;
+		private                 bool                 _validated;
+		private                 string?              _local_name;
+		private                 string?              _remote_name;
 
-		public bool    IsDisposed  => _disposed;
-		public bool    IsValidated => _validated;
-		public string? LocalName   => _local_name;
-		public string? RemoteName  => _remote_name;
+		public FachpiConnection Connection  => _conn;
+		public FachpiNode       Node        => _node;
+		public bool             IsDisposed  => _disposed;
+		public bool             IsValidated => _validated;
+		public string?          LocalName   => _local_name;
+		public string?          RemoteName  => _remote_name;
 
 		public NetworkStream Stream
 		{
@@ -49,19 +52,27 @@ namespace FastChatProtocolInterface
 				return _bw;
 			}
 		}
-
-		public FachpiCommunicationFlow(FachpiNode node, TcpClient tc, ReadOnlyMemory<byte> sig)
+		
+		static FachpiCommunicationFlow()
 		{
-			ArgumentNullException.ThrowIfNull(node);
+			_sig = new byte[] {
+				0x46, 0x41, 0x43, 0x48, 0x50, 0x49, 0x00, 0xFF,
+				0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF
+			};
+		}
+
+		public FachpiCommunicationFlow(FachpiConnection conn, TcpClient tc)
+		{
+			ArgumentNullException.ThrowIfNull(conn);
 			ArgumentNullException.ThrowIfNull(tc);
 
-			_disposed    = false;
-			_node        = node;
+			_conn        = conn;
+			_node        = conn.Owner;
 			_tc          = tc;
 			_ns          = tc.GetStream();
 			_br          = new(_ns);
 			_bw          = new(_ns);
-			_sig         = sig;
+			_disposed    = false;
 			_validated   = false;
 			_local_name  = null;
 			_remote_name = null;
@@ -79,13 +90,18 @@ namespace FastChatProtocolInterface
 
 		public void Run()
 		{
-			this.ValidateNode();
+			_node.OnStartFlow(this);
 
+			_validated = this.ValidateNode();
 			if (!_validated) {
+				Console.WriteLine("通信先が不正な反応を示しました。");
 				return;
 			}
 
-			this.ExchangeNodeName();
+			(_local_name, _remote_name) = this.ExchangeNodeName();
+			Console.WriteLine("ローカルの名前：{0}", _local_name);
+			Console.WriteLine("リモートの名前：{0}", _remote_name);
+			Console.WriteLine();
 
 			Task.WaitAll(
 				Task.Run(this.RunSender),
@@ -93,40 +109,26 @@ namespace FastChatProtocolInterface
 			);
 		}
 
-		private void ValidateNode()
+		protected virtual bool ValidateNode()
 		{
-			if (_validated) {
-				return;
-			}
-
 			_ns.SendData(_sig.Span);
-			if (_ns.ReceiveData().SequenceEqual(_sig.Span)) {
-				_validated = true;
-			} else {
-				Console.WriteLine("通信先が不正な反応を示しました。");
-			}
+			return _ns.ReceiveData().SequenceEqual(_sig.Span);
 		}
 
-		private void ExchangeNodeName()
+		protected virtual (string localName, string remoteName) ExchangeNodeName()
 		{
-			if (_local_name is not null && _remote_name is not null) {
-				return;
-			}
+			string ln = _node.Name ?? string.Empty;
+			_ns.SendText(ln);
 
-			_local_name = _node.Name ?? string.Empty;
-			_ns.SendText(_local_name);
+			string rn = _ns.ReceiveText();
 
-			_remote_name = _ns.ReceiveText();
-
-			Console.WriteLine("ローカルの名前：{0}", _local_name);
-			Console.WriteLine("リモートの名前：{0}", _remote_name);
-			Console.WriteLine();
+			return (ln, rn);
 		}
 
-		private void RunSender()
+		protected virtual void RunSender()
 			=> _node.RunSenderProcess(this);
 
-		private void RunReceiver()
+		protected virtual void RunReceiver()
 			=> _node.RunReceiverProcess(this);
 
 		public void Dispose()

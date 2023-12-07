@@ -6,9 +6,6 @@
 ****/
 
 using System;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Net.Sockets;
 using System.Threading;
 
 namespace FastChatProtocolInterface
@@ -25,6 +22,12 @@ namespace FastChatProtocolInterface
 
 		public abstract void OnConnected();
 
+		public void OnStartFlow(FachpiCommunicationFlow flow)
+		{
+			ArgumentNullException.ThrowIfNull(flow);
+			this.OnStartFlowCore(flow);
+		}
+
 		public void RunSenderProcess(FachpiCommunicationFlow flow, CancellationToken cancellationToken = default)
 		{
 			ArgumentNullException.ThrowIfNull(flow);
@@ -37,8 +40,8 @@ namespace FastChatProtocolInterface
 			this.RunReceiverProcessCore(flow, cancellationToken);
 		}
 
-		protected abstract void RunSenderProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken);
-
+		protected virtual  void OnStartFlowCore       (FachpiCommunicationFlow flow) { }
+		protected abstract void RunSenderProcessCore  (FachpiCommunicationFlow flow, CancellationToken cancellationToken);
 		protected abstract void RunReceiverProcessCore(FachpiCommunicationFlow flow, CancellationToken cancellationToken);
 	}
 }

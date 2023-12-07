@@ -6,8 +6,6 @@
 ****/
 
 using System;
-using System.Collections.Concurrent;
-using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +14,7 @@ namespace FastChatProtocolInterface
 {
 	public class FachpiClient : FachpiNode
 	{
-		public void Connect(string hostName, int port)
+		public virtual void Connect(string hostName, int port)
 		{
 			var conn = new FachpiConnection(
 				this,
