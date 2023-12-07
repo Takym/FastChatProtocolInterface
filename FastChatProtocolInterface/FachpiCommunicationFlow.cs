@@ -1,4 +1,11 @@
-﻿using System;
+﻿/****
+ * FACHPI: Fast Chat Protocol/Interface
+ * Copyright (C) 2023 Takym.
+ *
+ * distributed under the MIT License.
+****/
+
+using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
