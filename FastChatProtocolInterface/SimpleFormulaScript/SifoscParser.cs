@@ -12,6 +12,38 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 {
 	public static class SifoscParser
 	{
+		// TODO: TryParseStatement
+
+		/*
+		public static bool TryParseExpression(this SourceCode sc)
+		{
+			return false;
+		}
+
+		public static bool TryParseAddSubExpression(this SourceCode sc)
+		{
+			return false;
+		}
+		//*/
+
+		public static bool TryParseSignExpression(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
+		{
+			sc.SkipSpaces();
+			if (sc.TryPeekChar(out char ch) && ch is '+' or '-') {
+				sc.Advance();
+
+				if (sc.TryParseValue(out var obj)) {
+					result = ch == '+' ? obj.Plus() : obj.Minus();
+					return true;
+				}
+
+				sc.Retreat();
+			}
+
+			result = null;
+			return false;
+		}
+
 		public static bool TryParseValue(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
 		{
 			sc.SkipSpaces();

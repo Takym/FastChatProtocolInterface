@@ -10,11 +10,17 @@ using System.Text;
 
 namespace FastChatProtocolInterface.SimpleFormulaScript
 {
-	public record SifoscObject { }
+	public record SifoscObject
+	{
+		public virtual SifoscObject Plus    ()                    => this;
+		public virtual SifoscObject Minus   ()                    => SifoscNull.Instance;
+		public virtual SifoscObject Add     (SifoscObject? other) => SifoscNull.Instance;
+		public virtual SifoscObject Subtract(SifoscObject? other) => SifoscNull.Instance;
+	}
 
 	public sealed record SifoscArray : SifoscObject
 	{
-		public ReadOnlyMemory<SifoscObject?> Values { get; set; }
+		public ReadOnlyMemory<SifoscObject?> Values { get; init; }
 
 		protected override bool PrintMembers(StringBuilder builder)
 		{
@@ -29,6 +35,26 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 			}
 			return s.Length > 0;
 		}
+
+		public override SifoscObject Add(SifoscObject? other)
+		{
+			if (other is SifoscArray otherArray) {
+				int otherLen = otherArray.Values.Length;
+				if (otherLen == 0) {
+					return this;
+				}
+
+				int thisLen  = this.Values.Length;
+				var newArray = new SifoscObject?[thisLen + otherLen];
+
+				this      .Values.CopyTo(newArray);
+				otherArray.Values.CopyTo(newArray.AsMemory()[thisLen..]);
+
+				return this with { Values = newArray };
+			}
+
+			return SifoscNull.Instance;
+		}
 	}
 
 	public sealed record SifoscNull : SifoscObject
@@ -42,6 +68,27 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 	public sealed record SifoscInteger : SifoscObject
 	{
-		public int Value { get; set; }
+		public int Value { get; init; }
+
+		public override SifoscObject Minus()
+			=> this with { Value = -this.Value };
+
+		public override SifoscObject Add(SifoscObject? other)
+		{
+			if (other is SifoscInteger otherInt) {
+				return this with { Value = this.Value + otherInt.Value };
+			}
+
+			return SifoscNull.Instance;
+		}
+
+		public override SifoscObject Subtract(SifoscObject? other)
+		{
+			if (other is SifoscInteger otherInt) {
+				return this with { Value = this.Value - otherInt.Value };
+			}
+
+			return SifoscNull.Instance;
+		}
 	}
 }
