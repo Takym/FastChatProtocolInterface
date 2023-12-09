@@ -97,6 +97,7 @@ namespace FastChatProtocolInterface
 						if (result.ExecutionMode is null) {
 							result.Warnings!
 								.AppendFormat("不明な実行モード「{0}」が指定されました。", modeName)
+								.Append("大文字と小文字は区別されます。誤りがないかもう一度ご確認ください。")
 								.AppendLine();
 						}
 					} else {
@@ -117,7 +118,7 @@ namespace FastChatProtocolInterface
 						if (int.TryParse(args[i], out int port)) {
 							result = result with { Port = port };
 						} else {
-							result.Warnings!.AppendLine("ポート番号は数値で指定してください。");
+							result.Warnings!.AppendLine("ポート番号は整数値で指定してください。");
 						}
 					} else {
 						result.Warnings!.AppendLine("ポート番号が指定されていません。");
@@ -161,7 +162,7 @@ namespace FastChatProtocolInterface
 			Console.WriteLine("/Version        -v        バージョン情報を表示する。");
 			Console.WriteLine("/Help           -h        この説明書を表示する。");
 			Console.WriteLine("/NoLogo                   題名と著作権情報の表示を抑制する。");
-			Console.WriteLine("/ExecutionMode  -m        実行モードを指定する。");
+			Console.WriteLine("/ExecutionMode  -m        実行モードを指定する。大文字と小文字は区別される。");
 			Console.WriteLine("                          サーバーの場合は、server を指定する。");
 			Console.WriteLine("                          クライアントの場合は、client を指定する。");
 			Console.WriteLine("                          下記に完全な実行モードの一覧を記す。");

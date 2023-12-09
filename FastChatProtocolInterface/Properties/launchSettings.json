@@ -1,0 +1,24 @@
+{
+	"profiles": {
+		"FACHPI Server": {
+			"commandName": "Project",
+			"commandLineArgs": "-m fachpi -p 1024 -u S0"
+		},
+		"SIFOSC Server": {
+			"commandName": "Project",
+			"commandLineArgs": "-m sifosc -p 1024 -u S0"
+		},
+		"SIFOSC Read-Eval-Print Loop": {
+			"commandName": "Project",
+			"commandLineArgs": "-m repl"
+		},
+		"Client": {
+			"commandName": "Project",
+			"commandLineArgs": "-m client -n 127.0.0.1 -p 1024 -u C1"
+		},
+		"Server (Optimal to environment)": {
+			"commandName": "Project",
+			"commandLineArgs": "-m server -p 1024 -u S0"
+		}
+	}
+}
