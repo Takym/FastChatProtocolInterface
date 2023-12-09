@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Threading;
 
 namespace FastChatProtocolInterface.SimpleFormulaScript
@@ -49,6 +50,9 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		public static IEnumerable<SifoscObject> EnumerateAllObjects()
 			=> _objects.Values;
 
+		public static SifoscObject? GetObject(ulong id)
+			=> _objects.TryGetValue(id, out var result) ? result : null;
+
 		public virtual SifoscObject? Plus    ()                    => null;
 		public virtual SifoscObject? Minus   ()                    => null;
 		public virtual SifoscObject? Negate  ()                    => null;
@@ -60,6 +64,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		public virtual SifoscObject? And     (SifoscObject? other) => null;
 		public virtual SifoscObject? Or      (SifoscObject? other) => null;
 		public virtual SifoscObject? Xor     (SifoscObject? other) => null;
+		public virtual SifoscObject? Get     (SifoscObject? other) => null;
 	}
 
 	public sealed record SifoscNull : SifoscObject

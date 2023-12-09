@@ -178,6 +178,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 			sc.SkipSpaces();
 
 			return sc.TryParseParenthesisExpression(out result)
+				|| sc.TryParseGetExpression        (out result)
 				|| sc.TryParseSignExpression       (out result)
 				|| sc.TryParseNotExpression        (out result)
 				|| sc.TryParseValueLiteral         (out result);
@@ -198,6 +199,34 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 			result = null;
 			sc.EndScope(true);
 			return false;
+		}
+
+		public static bool TryParseGetExpression(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
+		{
+			sc.BeginScope();
+
+			if (sc.TryParseValueExpression(out var left)) {
+				sc.SkipSpaces();
+				if (sc.AdvanceIf('.') && sc.TryParseValueExpression(out var right)) {
+					result = left.Get(right);
+
+					if (result is null) {
+						goto fail;
+					} else {
+						goto succeed;
+					}
+				}
+			}
+
+			result = null;
+
+		fail:
+			sc.EndScope(true);
+			return false;
+
+		succeed:
+			sc.EndScope(false);
+			return true;
 		}
 
 		public static bool TryParseSignExpression(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)

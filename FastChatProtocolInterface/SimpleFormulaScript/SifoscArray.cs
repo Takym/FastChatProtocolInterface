@@ -79,5 +79,16 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 			return null;
 		}
+
+		public override SifoscObject? Get(SifoscObject? other)
+		{
+			if (other is SifoscInteger index &&
+				0 <= index.Value             &&
+				     index.Value < this.Values.Length) {
+				return this.Values.Span[unchecked((int)(index.Value))];
+			}
+
+			return null;
+		}
 	}
 }
