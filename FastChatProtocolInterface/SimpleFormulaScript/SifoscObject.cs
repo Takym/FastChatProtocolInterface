@@ -7,7 +7,7 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
@@ -15,33 +15,40 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 {
 	public record SifoscObject
 	{
-		private static readonly ConcurrentDictionary<ulong, SifoscObject> _objects = new();
-		private static          ulong                                     _next_id = 2;
+		private static readonly ConcurrentDictionary<ulong, SifoscObject> _objects = [];
+		private static          ulong                                     _next_id = 3;
 
-		public ulong Identifier { get; }
+		public         ulong  Identifier { get; }
+		public virtual string Code       => "newobj";
 
 		public SifoscObject()
 		{
-			switch (this) {
-			case SifoscNull:
-				this.Identifier = 0;
-				break;
-			case SifoscBoolean b when b.Value:
-				this.Identifier = 1;
-				break;
-			case SifoscBoolean:
-				this.Identifier = 2;
-				break;
-			default:
-				do {
-					this.Identifier = Interlocked.Increment(ref _next_id);
-				} while (!_objects.TryAdd(this.Identifier, this));
-				break;
-			}
-
-			bool succeeded = _objects.TryAdd(this.Identifier, this);
-			Debug.Assert(succeeded);
+			this.Identifier = this.CreateIdentifier();
 		}
+
+		protected SifoscObject(SifoscObject _)
+		{
+			this.Identifier = this.CreateIdentifier();
+		}
+
+		private ulong CreateIdentifier()
+		{
+			ulong? id = null;
+
+			do {
+				id = this switch {
+					SifoscNull              => id is null ? 0UL :                 throw new InvalidOperationException(),
+					SifoscViewForAllObjects => id is null ? 1UL :                 throw new InvalidOperationException(),
+					SifoscBoolean           => id is null ? 2UL : id == 2 ? 3UL : throw new InvalidOperationException(),
+					_                       => Interlocked.Increment(ref _next_id)
+				};
+			} while (!_objects.TryAdd(id.Value, this));
+
+			return id.Value;
+		}
+
+		public static IEnumerable<SifoscObject> EnumerateAllObjects()
+			=> _objects.Values;
 
 		public virtual SifoscObject? Plus    ()                    => null;
 		public virtual SifoscObject? Minus   ()                    => null;
@@ -54,6 +61,30 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 	public sealed record SifoscArray : SifoscObject
 	{
+		public override string Code
+		{
+			get
+			{
+				var sb   = new StringBuilder();
+				var span = this.Values.Span;
+
+				sb.Append('[');
+				for (int i = 0; i < span.Length; ++i) {
+					var obj = span[i];
+					if (obj is null) {
+						continue;
+					}
+					if (i != 0) {
+						sb.Append(',');
+					}
+					sb.Append(obj.Code);
+				}
+				sb.Append(']');
+
+				return sb.ToString();
+			}
+		}
+
 		public ReadOnlyMemory<SifoscObject?> Values { get; init; }
 
 		protected override bool PrintMembers(StringBuilder builder)
@@ -64,12 +95,18 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 			var s = this.Values.Span;
 			for (int i = 0; i < s.Length; ++i) {
-				if (i != 0 || appendComma) {
+				if (appendComma) {
 					builder.Append(", ");
 				}
-				builder.Append(s[i]);
+				var obj = s[i];
+				if (obj is SifoscViewForAllObjects view) {
+					view.PrintMembersSimply(builder);
+				} else {
+					builder.Append(obj);
+				}
+				appendComma = true;
 			}
-			return s.Length > 0;
+			return appendComma;
 		}
 
 		public override SifoscObject? Add(SifoscObject? other)
@@ -97,9 +134,52 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 	{
 		private static readonly SifoscNull _inst = new();
 
-		public static SifoscNull Instance => _inst;
+		public static   SifoscNull Instance => _inst;
+		public override string     Code     => "null";
 
 		private SifoscNull() { }
+	}
+
+	public sealed record SifoscViewForAllObjects : SifoscObject
+	{
+		private static readonly SifoscViewForAllObjects _inst = new();
+
+		public static   SifoscViewForAllObjects Instance => _inst;
+		public override string                  Code     => "allobj";
+
+		private SifoscViewForAllObjects() { }
+
+		protected override bool PrintMembers(StringBuilder builder)
+		{
+			bool appendComma = base.PrintMembers(builder);
+
+			foreach (var item in EnumerateAllObjects()) {
+				if (appendComma) {
+					builder.Append(", ");
+				}
+				if (item is SifoscViewForAllObjects) {
+					this.PrintMembersSimply(builder);
+				} else {
+					builder.Append(item);
+				}
+				appendComma = true;
+			}
+
+			return appendComma;
+		}
+
+		public void PrintMembersSimply(StringBuilder builder)
+		{
+			builder
+				.Append(nameof(SifoscViewForAllObjects))
+				.Append(" { ");
+
+			if (base.PrintMembers(builder)) {
+				builder.Append(' ');
+			}
+
+			builder.Append('}');
+		}
 	}
 
 	public sealed record SifoscBoolean : SifoscObject
@@ -107,17 +187,18 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		private static readonly SifoscBoolean _true  = new();
 		private static readonly SifoscBoolean _false = new();
 
-		public static SifoscBoolean TrueValue  => _true;
-		public static SifoscBoolean FalseValue => _false;
-
-		public bool Value => ReferenceEquals(this, _true);
+		public static   SifoscBoolean TrueValue  => _true;
+		public static   SifoscBoolean FalseValue => _false;
+		public          bool          Value      => ReferenceEquals(this, _true);
+		public override string        Code       => this.Value ? "true" : "false";
 
 		private SifoscBoolean() { }
 	}
 
 	public sealed record SifoscInteger : SifoscObject
 	{
-		public long Value { get; init; }
+		public          long   Value { get; init; }
+		public override string Code  => this.Value.ToString();
 
 		public override SifoscObject? Plus()
 			=> this;

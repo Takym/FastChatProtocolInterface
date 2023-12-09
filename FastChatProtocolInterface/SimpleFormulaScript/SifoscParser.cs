@@ -191,6 +191,9 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 			} else if (sc.TryParseNewObjectLiteral(out var objVal)) {
 				result = objVal;
 				return true;
+			} else if (sc.TryParseAllObjectsLiteral(out var allVal)) {
+				result = allVal;
+				return true;
 			} else if (sc.TryParseBooleanLiteral(out var flgVal)) {
 				result = flgVal;
 				return true;
@@ -247,6 +250,17 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		{
 			if (sc.TryScanKeyword("newobj")) {
 				result = new();
+				return true;
+			} else {
+				result = null;
+				return false;
+			}
+		}
+
+		public static bool TryParseAllObjectsLiteral(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscViewForAllObjects? result)
+		{
+			if (sc.TryScanKeyword("allobj")) {
+				result = SifoscViewForAllObjects.Instance;
 				return true;
 			} else {
 				result = null;
