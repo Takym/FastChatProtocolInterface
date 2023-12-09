@@ -18,6 +18,9 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		public override SifoscObject? Minus()
 			=> this with { Value = -this.Value };
 
+		public override SifoscObject? Negate()
+			=> this with { Value = ~this.Value };
+
 		public override SifoscObject? Add(SifoscObject? other)
 		{
 			if (other is SifoscInteger otherInt) {
@@ -58,6 +61,33 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		{
 			if (other is SifoscInteger otherInt) {
 				return this with { Value = this.Value % otherInt.Value };
+			}
+
+			return null;
+		}
+
+		public override SifoscObject? And(SifoscObject? other)
+		{
+			if (other is SifoscInteger otherInt) {
+				return this with { Value = this.Value & otherInt.Value };
+			}
+
+			return null;
+		}
+
+		public override SifoscObject? Or(SifoscObject? other)
+		{
+			if (other is SifoscInteger otherInt) {
+				return this with { Value = this.Value | otherInt.Value };
+			}
+
+			return null;
+		}
+
+		public override SifoscObject? Xor(SifoscObject? other)
+		{
+			if (other is SifoscInteger otherInt) {
+				return this with { Value = this.Value ^ otherInt.Value };
 			}
 
 			return null;

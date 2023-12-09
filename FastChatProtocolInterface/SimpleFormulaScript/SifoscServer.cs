@@ -26,7 +26,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 		public static string RunScriptLine(string s)
 		{
-			// SIFOSC の例：[ [ null, allobj, true, false, newobj, 123 ], [ null, newobj, 123, +456, -789, [ ] ], [ 1, 2, 3 ] + [ 2 + 2, 5, 2 * 3 ] + [ 1 + 2 * 3 ], +-+-+-+100, ([([([])])]), 1 + ((1 + 2) * 3 + 1) / 2 % 3 - 4 ];
+			// SIFOSC の例：[ [ null, allobj, true, false, newobj, 123 ], [ null, newobj, 123, +456, -789, [ ] ], [ 1, 2, 3 ] + [ 2 + 2, 5, 2 * 3 ] + [ 1 + 2 * 3 ], +-+-+-+100, ([([([])])]), 1 + ((1 + 2) * 3 + 1) / 2 % 3 - 4, [ true | false & true ^ false, (true | false) & (true ^ false) & false, !(((3 & 5) + (3 | 5) + (3 ^ 5)) - (3 & 5 + 3 | 5 + 3 ^ 5)), !!true, !!0, !!123, !!!false ] ];
 
 			var sc = new SourceCode(s);
 			if (sc.TryParse(out var result)) {

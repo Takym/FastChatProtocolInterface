@@ -51,11 +51,15 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 		public virtual SifoscObject? Plus    ()                    => null;
 		public virtual SifoscObject? Minus   ()                    => null;
+		public virtual SifoscObject? Negate  ()                    => null;
 		public virtual SifoscObject? Add     (SifoscObject? other) => null;
 		public virtual SifoscObject? Subtract(SifoscObject? other) => null;
 		public virtual SifoscObject? Multiply(SifoscObject? other) => null;
 		public virtual SifoscObject? Divide  (SifoscObject? other) => null;
 		public virtual SifoscObject? Modulo  (SifoscObject? other) => null;
+		public virtual SifoscObject? And     (SifoscObject? other) => null;
+		public virtual SifoscObject? Or      (SifoscObject? other) => null;
+		public virtual SifoscObject? Xor     (SifoscObject? other) => null;
 	}
 
 	public sealed record SifoscNull : SifoscObject
@@ -66,18 +70,5 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		public override string     Code     => "null";
 
 		private SifoscNull() { }
-	}
-
-	public sealed record SifoscBoolean : SifoscObject
-	{
-		private static readonly SifoscBoolean _true  = new();
-		private static readonly SifoscBoolean _false = new();
-
-		public static   SifoscBoolean TrueValue  => _true;
-		public static   SifoscBoolean FalseValue => _false;
-		public          bool          Value      => ReferenceEquals(this, _true);
-		public override string        Code       => this.Value ? "true" : "false";
-
-		private SifoscBoolean() { }
 	}
 }
