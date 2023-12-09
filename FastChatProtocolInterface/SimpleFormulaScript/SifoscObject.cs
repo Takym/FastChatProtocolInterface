@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace FastChatProtocolInterface.SimpleFormulaScript
@@ -59,77 +58,6 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		public virtual SifoscObject? Modulo  (SifoscObject? other) => null;
 	}
 
-	public sealed record SifoscArray : SifoscObject
-	{
-		public override string Code
-		{
-			get
-			{
-				var sb   = new StringBuilder();
-				var span = this.Values.Span;
-
-				sb.Append('[');
-				for (int i = 0; i < span.Length; ++i) {
-					var obj = span[i];
-					if (obj is null) {
-						continue;
-					}
-					if (i != 0) {
-						sb.Append(',');
-					}
-					sb.Append(obj.Code);
-				}
-				sb.Append(']');
-
-				return sb.ToString();
-			}
-		}
-
-		public ReadOnlyMemory<SifoscObject?> Values { get; init; }
-
-		protected override bool PrintMembers(StringBuilder builder)
-		{
-			// 参考：https://qiita.com/muniel/items/fd843abc55a5626e5c45
-
-			bool appendComma = base.PrintMembers(builder);
-
-			var s = this.Values.Span;
-			for (int i = 0; i < s.Length; ++i) {
-				if (appendComma) {
-					builder.Append(", ");
-				}
-				var obj = s[i];
-				if (obj is SifoscViewForAllObjects view) {
-					view.PrintMembersSimply(builder);
-				} else {
-					builder.Append(obj);
-				}
-				appendComma = true;
-			}
-			return appendComma;
-		}
-
-		public override SifoscObject? Add(SifoscObject? other)
-		{
-			if (other is SifoscArray otherArray) {
-				int otherLen = otherArray.Values.Length;
-				if (otherLen == 0) {
-					return this;
-				}
-
-				int thisLen  = this.Values.Length;
-				var newArray = new SifoscObject?[thisLen + otherLen];
-
-				this      .Values.CopyTo(newArray);
-				otherArray.Values.CopyTo(newArray.AsMemory()[thisLen..]);
-
-				return this with { Values = newArray };
-			}
-
-			return null;
-		}
-	}
-
 	public sealed record SifoscNull : SifoscObject
 	{
 		private static readonly SifoscNull _inst = new();
@@ -138,48 +66,6 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		public override string     Code     => "null";
 
 		private SifoscNull() { }
-	}
-
-	public sealed record SifoscViewForAllObjects : SifoscObject
-	{
-		private static readonly SifoscViewForAllObjects _inst = new();
-
-		public static   SifoscViewForAllObjects Instance => _inst;
-		public override string                  Code     => "allobj";
-
-		private SifoscViewForAllObjects() { }
-
-		protected override bool PrintMembers(StringBuilder builder)
-		{
-			bool appendComma = base.PrintMembers(builder);
-
-			foreach (var item in EnumerateAllObjects()) {
-				if (appendComma) {
-					builder.Append(", ");
-				}
-				if (item is SifoscViewForAllObjects) {
-					this.PrintMembersSimply(builder);
-				} else {
-					builder.Append(item);
-				}
-				appendComma = true;
-			}
-
-			return appendComma;
-		}
-
-		public void PrintMembersSimply(StringBuilder builder)
-		{
-			builder
-				.Append(nameof(SifoscViewForAllObjects))
-				.Append(" { ");
-
-			if (base.PrintMembers(builder)) {
-				builder.Append(' ');
-			}
-
-			builder.Append('}');
-		}
 	}
 
 	public sealed record SifoscBoolean : SifoscObject
@@ -193,62 +79,5 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		public override string        Code       => this.Value ? "true" : "false";
 
 		private SifoscBoolean() { }
-	}
-
-	public sealed record SifoscInteger : SifoscObject
-	{
-		public          long   Value { get; init; }
-		public override string Code  => this.Value.ToString();
-
-		public override SifoscObject? Plus()
-			=> this;
-
-		public override SifoscObject? Minus()
-			=> this with { Value = -this.Value };
-
-		public override SifoscObject? Add(SifoscObject? other)
-		{
-			if (other is SifoscInteger otherInt) {
-				return this with { Value = this.Value + otherInt.Value };
-			}
-
-			return null;
-		}
-
-		public override SifoscObject? Subtract(SifoscObject? other)
-		{
-			if (other is SifoscInteger otherInt) {
-				return this with { Value = this.Value - otherInt.Value };
-			}
-
-			return null;
-		}
-
-		public override SifoscObject? Multiply(SifoscObject? other)
-		{
-			if (other is SifoscInteger otherInt) {
-				return this with { Value = this.Value * otherInt.Value };
-			}
-
-			return null;
-		}
-
-		public override SifoscObject? Divide(SifoscObject? other)
-		{
-			if (other is SifoscInteger otherInt) {
-				return this with { Value = this.Value / otherInt.Value };
-			}
-
-			return null;
-		}
-
-		public override SifoscObject? Modulo(SifoscObject? other)
-		{
-			if (other is SifoscInteger otherInt) {
-				return this with { Value = this.Value % otherInt.Value };
-			}
-
-			return null;
-		}
 	}
 }
