@@ -15,7 +15,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 	{
 		public static bool TryParse(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
 		{
-			if (sc.TryParseExpression(out result)) {
+			if (sc.TryParseStatement(out result)) {
 				sc.SkipSpaces();
 				return sc.Index >= sc.Length;
 			}
@@ -23,7 +23,16 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 			return false;
 		}
 
-		// TODO: TryParseStatement
+		public static bool TryParseStatement(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
+		{
+			if (sc.TryParseExpression(out result)) {
+				sc.SkipSpaces();
+				sc.AdvanceIf(';');
+				return true;
+			}
+
+			return false;
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool TryParseExpression(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
@@ -148,20 +157,16 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		{
 			sc.BeginScope();
 
-			if (sc.TryPeekChar(out char ch) && ch is '+' or '-') {
-				sc.Advance();
+			if (sc.TryReadChar            (out char ch ) && ch is '+' or '-' &&
+				sc.TryParseValueExpression(out var  obj)
+			) {
+				result = ch == '+' ? obj.Plus() : obj.Minus();
 
-				if (sc.TryParseValueExpression(out var obj)) {
-					result = ch == '+' ? obj.Plus() : obj.Minus();
-
-					if (result is null) {
-						goto fail;
-					} else {
-						goto succeed;
-					}
+				if (result is null) {
+					goto fail;
+				} else {
+					goto succeed;
 				}
-
-				//sc.Retreat();
 			}
 
 			result = null;
@@ -177,16 +182,19 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 		public static bool TryParseValueLiteral(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
 		{
-			if (TryParseArrayLiteral(sc, out var aryVal)) {
+			if (sc.TryParseArrayLiteral(out var aryVal)) {
 				result = aryVal;
 				return true;
-			} else if (TryParseNullLiteral(sc, out var nulVal)) {
+			} else if (sc.TryParseNullLiteral(out var nulVal)) {
 				result = nulVal;
 				return true;
-			} else if (TryParseNewObjectLiteral(sc, out var objVal)) {
+			} else if (sc.TryParseNewObjectLiteral(out var objVal)) {
 				result = objVal;
 				return true;
-			} else if (TryParseIntegerLiteral(sc, out var intVal)) {
+			} else if (sc.TryParseBooleanLiteral(out var flgVal)) {
+				result = flgVal;
+				return true;
+			} else if (sc.TryParseIntegerLiteral(out var intVal)) {
 				result = intVal;
 				return true;
 			} else {
@@ -239,6 +247,20 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		{
 			if (sc.TryScanKeyword("newobj")) {
 				result = new();
+				return true;
+			} else {
+				result = null;
+				return false;
+			}
+		}
+
+		public static bool TryParseBooleanLiteral(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscBoolean? result)
+		{
+			if (sc.TryScanKeyword("true")) {
+				result = SifoscBoolean.TrueValue;
+				return true;
+			} else if (sc.TryScanKeyword("false")) {
+				result = SifoscBoolean.FalseValue;
 				return true;
 			} else {
 				result = null;
