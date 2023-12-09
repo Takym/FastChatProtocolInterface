@@ -12,10 +12,13 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 {
 	public record SifoscObject
 	{
-		public virtual SifoscObject Plus    ()                    => this;
-		public virtual SifoscObject Minus   ()                    => SifoscNull.Instance;
-		public virtual SifoscObject Add     (SifoscObject? other) => SifoscNull.Instance;
-		public virtual SifoscObject Subtract(SifoscObject? other) => SifoscNull.Instance;
+		public virtual SifoscObject? Plus    ()                    => null;
+		public virtual SifoscObject? Minus   ()                    => null;
+		public virtual SifoscObject? Add     (SifoscObject? other) => null;
+		public virtual SifoscObject? Subtract(SifoscObject? other) => null;
+		public virtual SifoscObject? Multiply(SifoscObject? other) => null;
+		public virtual SifoscObject? Divide  (SifoscObject? other) => null;
+		public virtual SifoscObject? Modulo  (SifoscObject? other) => null;
 	}
 
 	public sealed record SifoscArray : SifoscObject
@@ -36,7 +39,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 			return s.Length > 0;
 		}
 
-		public override SifoscObject Add(SifoscObject? other)
+		public override SifoscObject? Add(SifoscObject? other)
 		{
 			if (other is SifoscArray otherArray) {
 				int otherLen = otherArray.Values.Length;
@@ -53,7 +56,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 				return this with { Values = newArray };
 			}
 
-			return SifoscNull.Instance;
+			return null;
 		}
 	}
 
@@ -68,27 +71,57 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 	public sealed record SifoscInteger : SifoscObject
 	{
-		public int Value { get; init; }
+		public long Value { get; init; }
 
-		public override SifoscObject Minus()
+		public override SifoscObject? Plus()
+			=> this;
+
+		public override SifoscObject? Minus()
 			=> this with { Value = -this.Value };
 
-		public override SifoscObject Add(SifoscObject? other)
+		public override SifoscObject? Add(SifoscObject? other)
 		{
 			if (other is SifoscInteger otherInt) {
 				return this with { Value = this.Value + otherInt.Value };
 			}
 
-			return SifoscNull.Instance;
+			return null;
 		}
 
-		public override SifoscObject Subtract(SifoscObject? other)
+		public override SifoscObject? Subtract(SifoscObject? other)
 		{
 			if (other is SifoscInteger otherInt) {
 				return this with { Value = this.Value - otherInt.Value };
 			}
 
-			return SifoscNull.Instance;
+			return null;
+		}
+
+		public override SifoscObject? Multiply(SifoscObject? other)
+		{
+			if (other is SifoscInteger otherInt) {
+				return this with { Value = this.Value * otherInt.Value };
+			}
+
+			return null;
+		}
+
+		public override SifoscObject? Divide(SifoscObject? other)
+		{
+			if (other is SifoscInteger otherInt) {
+				return this with { Value = this.Value / otherInt.Value };
+			}
+
+			return null;
+		}
+
+		public override SifoscObject? Modulo(SifoscObject? other)
+		{
+			if (other is SifoscInteger otherInt) {
+				return this with { Value = this.Value % otherInt.Value };
+			}
+
+			return null;
 		}
 	}
 }

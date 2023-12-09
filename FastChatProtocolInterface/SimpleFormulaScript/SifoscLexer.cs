@@ -12,7 +12,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 		public static bool TryScanKeyword(this SourceCode sc, string keyword)
 			=> sc.AdvanceIf(keyword) && !(sc.TryPeekChar(out char ch) && IsAlphanum(ch));
 
-		public static bool TryScanSignedInteger(this SourceCode sc, out int result)
+		public static bool TryScanSignedInteger(this SourceCode sc, out long result)
 		{
 			bool shouldRetreat = sc.TryScanSign(out bool isMinus);
 
@@ -47,7 +47,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 			return false;
 		}
 
-		public static bool TryScanUnsignedInteger(this SourceCode sc, out int result)
+		public static bool TryScanUnsignedInteger(this SourceCode sc, out long result)
 		{
 			result = 0;
 
