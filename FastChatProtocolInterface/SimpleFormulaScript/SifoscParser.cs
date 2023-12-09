@@ -135,7 +135,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 			ref var left   = ref result;
 			char    op     = '\0';
 
-			while (sc.TryParseValueExpression(out var right)) {
+			while (sc.TryParseGetExpression(out var right)) {
 				switch (op) {
 				case '\0' when left is null:
 					left = right;
@@ -173,12 +173,51 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 			}
 		}
 
+		public static bool TryParseGetExpression(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
+		{
+			sc.BeginScope();
+
+			result = null;
+			ref var left   = ref result;
+			char    op     = '\0';
+
+			while (sc.TryParseValueExpression(out var right)) {
+				switch (op) {
+				case '\0' when left is null:
+					left = right;
+					break;
+				case '.':
+					left = left?.Get(right);
+					break;
+				default:
+					left = null;
+					goto end;
+				}
+
+				sc.SkipSpaces();
+				if (!sc.TryReadChar(out op) || op is not '.') {
+					if (op != '\0') {
+						sc.Retreat();
+					}
+					break;
+				}
+			}
+
+		end:
+			if (result is null) {
+				sc.EndScope(true);
+				return false;
+			} else {
+				sc.EndScope(false);
+				return true;
+			}
+		}
+
 		public static bool TryParseValueExpression(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
 		{
 			sc.SkipSpaces();
 
 			return sc.TryParseParenthesisExpression(out result)
-				|| sc.TryParseGetExpression        (out result)
 				|| sc.TryParseSignExpression       (out result)
 				|| sc.TryParseNotExpression        (out result)
 				|| sc.TryParseValueLiteral         (out result);
@@ -199,34 +238,6 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 			result = null;
 			sc.EndScope(true);
 			return false;
-		}
-
-		public static bool TryParseGetExpression(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
-		{
-			sc.BeginScope();
-
-			if (sc.TryParseValueExpression(out var left)) {
-				sc.SkipSpaces();
-				if (sc.AdvanceIf('.') && sc.TryParseValueExpression(out var right)) {
-					result = left.Get(right);
-
-					if (result is null) {
-						goto fail;
-					} else {
-						goto succeed;
-					}
-				}
-			}
-
-			result = null;
-
-		fail:
-			sc.EndScope(true);
-			return false;
-
-		succeed:
-			sc.EndScope(false);
-			return true;
 		}
 
 		public static bool TryParseSignExpression(this SourceCode sc, [NotNullWhen(true)][MaybeNullWhen(false)] out SifoscObject? result)
