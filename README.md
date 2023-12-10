@@ -38,7 +38,7 @@ Copyright (C) 2023 Takym.
 	FACHPI: Fast Chat Protocol/Interface
 	Copyright (C) 2023 Takym.
 
-	バージョン：0.1.0.0
+	バージョン：0.1.1.0
 
 	FACHPI コマンド行引数説明書
 	===========================
@@ -56,7 +56,7 @@ Copyright (C) 2023 Takym.
 	/Version        -v        バージョン情報を表示する。
 	/Help           -h        この説明書を表示する。
 	/NoLogo                   題名と著作権情報の表示を抑制する。
-	/ExecutionMode  -m        実行モードを指定する。
+	/ExecutionMode  -m        実行モードを指定する。大文字と小文字は区別される。
 	                          サーバーの場合は、server を指定する。
 	                          クライアントの場合は、client を指定する。
 	                          下記に完全な実行モードの一覧を記す。

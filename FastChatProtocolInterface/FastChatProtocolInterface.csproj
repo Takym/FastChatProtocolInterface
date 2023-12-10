@@ -15,7 +15,7 @@
 	</PropertyGroup>
 	<PropertyGroup Label="Version">
 		<Product>FACHPI: Fast Chat Protocol/Interface</Product>
-		<Version>0.1.0.0</Version>
+		<Version>0.1.1.0</Version>
 		<Authors>たかやま</Authors>
 		<Copyright>Copyright (C) 2023 Takym.</Copyright>
 		<Description>「高速会話プロトコル・インターフェース」の参考実装。</Description>
