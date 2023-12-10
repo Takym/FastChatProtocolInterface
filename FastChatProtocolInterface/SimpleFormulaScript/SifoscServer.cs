@@ -6,12 +6,20 @@
 ****/
 
 using System;
+using System.Diagnostics;
 using System.Net;
 
 namespace FastChatProtocolInterface.SimpleFormulaScript
 {
 	public class SifoscServer(IPAddress ipAddr, int port) : FachpiServer(ipAddr, port)
 	{
+		static SifoscServer()
+		{
+			bool succeeded = new SourceCode("[null,allobj,true,false]").TryParse(out _);
+
+			Debug.Assert(succeeded);
+		}
+
 		public override void OnConnected()
 		{
 			base.OnConnected();
@@ -26,7 +34,7 @@ namespace FastChatProtocolInterface.SimpleFormulaScript
 
 		public static string RunScriptLine(string s)
 		{
-			// SIFOSC の例：[ [ null, allobj, true, false, newobj, 123 ], [ null, newobj, 123, +456, -789, [ ] ], [ 1, 2, 3 ] + [ 2 + 2, 5, 2 * 3 ] + [ 1 + 2 * 3 ], +-+-+-+100, ([([([])])]), 1 + ((1 + 2) * 3 + 1) / 2 % 3 - 4, [ true | false & true ^ false, (true | false) & (true ^ false) & false, !(((3 & 5) + (3 | 5) + (3 ^ 5)) - (3 & 5 + 3 | 5 + 3 ^ 5)), !!true, !!0, !!123, !!!false ] ];
+			// SIFOSC の例：[ [ null, allobj, true, false, newobj, 123 ], [ null, newobj, 123, +456, -789, [ ] ], [ 1, 2, 3 ] + [ 2 + 2, 5, 2 * 3 ] + [ 1 + 2 * 3 ], +-+-+-+100, ([([([])])]), 1 + ((1 + 2) * 3 + 1) / 2 % 3 - 4, [ true | false & true ^ false, (true | false) & (true ^ false) & false, !(((3 & 5) + (3 | 5) + (3 ^ 5)) - (3 & 5 + 3 | 5 + 3 ^ 5)), !!true, !!0, !!123, !!!false ], [ allobj.0, allobj.1.1.3 ].1 ];
 
 			var sc = new SourceCode(s);
 			if (sc.TryParse(out var result)) {
